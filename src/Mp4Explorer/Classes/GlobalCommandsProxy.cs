@@ -23,5 +23,21 @@ namespace Mp4Explorer
                 return GlobalCommands.OpenCommand;
             }
         }
+
+		public virtual CompositeCommand RefreshCommand
+		{
+			get
+			{
+				return GlobalCommands.RefreshCommand;
+			}
+		}
+
+		public virtual CompositeCommand ExpandAllCommand
+		{
+			get
+			{
+				return GlobalCommands.ExpandAllCommand;
+			}
+		}
     }
 }

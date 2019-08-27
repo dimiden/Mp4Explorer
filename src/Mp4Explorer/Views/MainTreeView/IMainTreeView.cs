@@ -38,5 +38,8 @@ namespace Mp4Explorer
         event EventHandler<DataEventArgs<TreeViewItem>> NodeSelected;
 
         #endregion
-    }
+
+		TreeView TreeView { get; }
+		MainTreePresenter Presenter { get; set; }
+	}
 }

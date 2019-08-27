@@ -1,5 +1,10 @@
 ﻿<UserControl x:Class="Mp4Explorer.MainTreeView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <TreeView Name="treeView" TreeViewItem.Selected="treeView_Selected" VirtualizingStackPanel.VirtualizationMode="Recycling" VirtualizingStackPanel.IsVirtualizing="True" />
+    <TreeView Name="treeView" TreeViewItem.Selected="treeView_Selected"
+              VirtualizingStackPanel.VirtualizationMode="Recycling"
+              VirtualizingStackPanel.IsVirtualizing="True"
+              AllowDrop="true"
+              DragOver="treeView_DragOver" Drop="treeView_Drop"
+              />
 </UserControl>

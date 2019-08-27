@@ -13,23 +13,30 @@
         <Image x:Key="imageFov" Source="/Mp4Explorer;component/Images/fov_16.png" Height="16" Width="16" />
         <Image x:Key="imageUploadToAzure" Source="/Mp4Explorer;component/Images/upload_to_azure_16.png" Height="16" Width="16" />
     </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Key="F5" Command="{x:Static app:GlobalCommands.RefreshCommand}" />
+    </Window.InputBindings>
     <DockPanel>
         <Border DockPanel.Dock="Top">
             <Menu Height="22" Name="menuMain">
-                <MenuItem Header="File">
-                    <MenuItem Header="Open" Command="{x:Static app:GlobalCommands.OpenCommand}" Icon="{StaticResource imageOpen}" />
+                <MenuItem Header="_File">
+                    <MenuItem Header="_Open" Command="{x:Static app:GlobalCommands.OpenCommand}" Icon="{StaticResource imageOpen}" />
+                    <MenuItem Header="_Refresh" Command="{x:Static app:GlobalCommands.RefreshCommand}" />
                     <Separator/>
-                    <MenuItem Header="Exit" Name="menuItemExit" Click="menuItemExit_Click" />
+                    <MenuItem Header="E_xit" Name="menuItemExit" Click="menuItemExit_Click" />
                 </MenuItem>
-                <MenuItem Header="Tools">
-                    <MenuItem Name="menuItemConvertToMp4" Header="Conver video to MP4 (H264+AAC)" Click="menuItemConvertVideoToMp4_Click" IsEnabled="False" />
-                    <MenuItem Header="Smooth Streaming" Icon="{StaticResource imageSmoothStreaming}">
-                        <MenuItem Name="menuItemCreateFixedOffset" Header="Create Fixed Offset" Click="menuItemCreateFixedOffset_Click" Icon="{StaticResource imageFov}" />
-                        <MenuItem Name="menuItemUploadToAzure" Header="Upload to Azure" Click="menuItemUploadToAzure_Click" Icon="{StaticResource imageUploadToAzure}" />
+                <MenuItem Header="_Select">
+                    <MenuItem Header="_Expand all" Command="{x:Static app:GlobalCommands.ExpandAllCommand}" IsEnabled="true" />
+                </MenuItem>
+                <MenuItem Header="_Tools">
+                    <MenuItem Name="menuItemConvertToMp4" Header="_Convert video to MP4 (H264+AAC)" Click="menuItemConvertVideoToMp4_Click" IsEnabled="False" />
+                    <MenuItem Header="_Smooth Streaming" Icon="{StaticResource imageSmoothStreaming}">
+                        <MenuItem Name="menuItemCreateFixedOffset" Header="_Create Fixed Offset" Click="menuItemCreateFixedOffset_Click" Icon="{StaticResource imageFov}" />
+                        <MenuItem Name="menuItemUploadToAzure" Header="_Upload to Azure" Click="menuItemUploadToAzure_Click" Icon="{StaticResource imageUploadToAzure}" />
                     </MenuItem>
                 </MenuItem>
-                <MenuItem Header="Help">
-                    <MenuItem Name="menuItemAbout" Header="About Mp4 Explorer" Click="menuItemAbout_Click" />
+                <MenuItem Header="_Help">
+                    <MenuItem Name="menuItemAbout" Header="_About Mp4 Explorer" Click="menuItemAbout_Click" />
                 </MenuItem>
             </Menu>
         </Border>

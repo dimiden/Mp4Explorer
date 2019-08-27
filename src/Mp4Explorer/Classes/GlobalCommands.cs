@@ -17,5 +17,8 @@ namespace Mp4Explorer
         /// 
         /// </summary>
         public static CompositeCommand OpenCommand = new CompositeCommand();
+
+		public static CompositeCommand RefreshCommand = new CompositeCommand();
+		public static CompositeCommand ExpandAllCommand = new CompositeCommand();
     }
 }

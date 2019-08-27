@@ -44,6 +44,8 @@ namespace Mp4Explorer
         /// </summary>
         private Mp4File file;
 
+		private string lastFileName;
+
         /// <summary>
         /// 
         /// </summary>
@@ -68,10 +70,15 @@ namespace Mp4Explorer
 
             this.View = view;
             this.View.NodeSelected += View_NodeSelected;
+			this.View.Presenter = this;
 
             this.OpenCommand = new DelegateCommand<object>(this.Open);
+			this.RefreshCommand = new DelegateCommand<object>(this.Refresh);
+			this.ExpandAllCommand = new DelegateCommand<object>(this.ExpandAll);
             
             this.commandsProxy.OpenCommand.RegisterCommand(this.OpenCommand);
+			this.commandsProxy.RefreshCommand.RegisterCommand(this.RefreshCommand);
+			this.commandsProxy.ExpandAllCommand.RegisterCommand(this.ExpandAllCommand);
         }
 
         #endregion
@@ -87,6 +94,9 @@ namespace Mp4Explorer
         /// 
         /// </summary>
         public DelegateCommand<object> OpenCommand { get; private set; }
+
+		public DelegateCommand<object> RefreshCommand { get; private set; }
+		public DelegateCommand<object> ExpandAllCommand { get; private set; }
 
         #endregion
 
@@ -126,48 +136,7 @@ namespace Mp4Explorer
 
                 if (openFileDialog.ShowDialog() == true)
                 {
-                    if (stream != null)
-                    {
-                        stream.Close();
-                    }
-
-                    BackgroundWorker backgroundWorker = new BackgroundWorker();
-
-                    Exception exceptionError = null;
-
-                    backgroundWorker.DoWork += delegate(object s, DoWorkEventArgs args)
-                    {
-                        try
-                        {
-                            stream = new Mp4Stream(openFileDialog.OpenFile());
-                            file = new Mp4File(stream);
-
-                            List<Mp4Box> unknowBoxes = file.Boxes.FindAll(b => b is Mp4UnknownBox);
-
-                            if (unknowBoxes.Count > 1)
-                                throw new Exception("Too many unknow boxes.");
-
-                            View.Dispatcher.Invoke(new Action(delegate
-                                {
-                                    this.View.RootNode = BuildTree(file, new FileInfo(openFileDialog.FileName).Name);
-
-                                    controller.RemoveViews();
-                                }));
-                        }
-                        catch (Exception ex)
-                        {
-                            exceptionError = ex;
-                        }
-                    };
-
-                    ProgressWindow progressWindow = new ProgressWindow();
-
-                    progressWindow.Worker = backgroundWorker;
-
-                    progressWindow.ShowDialog();
-
-                    if (exceptionError != null)
-                        throw exceptionError;
+					OpenFile(openFileDialog.FileName);
                 }
             }
             catch
@@ -175,6 +144,96 @@ namespace Mp4Explorer
                 MessageBox.Show("Error loading mp4 file", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+		private void Refresh(object obj)
+		{
+			if (lastFileName != null)
+			{
+				OpenFile(lastFileName);
+			}
+		}
+
+		private void ExpandRecursive(TreeViewItem item)
+		{
+			if(item != null)
+			{
+				item.IsExpanded = true;
+
+				foreach(TreeViewItem subItem in item.Items)
+				{
+					ExpandRecursive(subItem);
+				}
+			}
+		}
+
+		private void ExpandAll(object obj)
+		{
+			ExpandRecursive(this.View.RootNode);
+		}
+
+		public void OpenFile(string fileName)
+		{
+			Stream fileStream;
+
+			try
+			{
+				fileStream = File.OpenRead(fileName);
+			}
+			catch (FileNotFoundException)
+			{
+				MessageBox.Show("Could not open file: " + fileName);
+				return;
+			}
+
+			if (stream != null)
+			{
+				stream.Close();
+			}
+
+			lastFileName = fileName;
+
+			Window window = Window.GetWindow(View.TreeView);
+
+			window.Title = "Mp4 Explorer - " + Path.GetFileName(fileName) + " (" + fileName + ")";
+
+			BackgroundWorker backgroundWorker = new BackgroundWorker();
+
+			Exception exceptionError = null;
+
+			backgroundWorker.DoWork += delegate(object s, DoWorkEventArgs args)
+			{
+				try
+				{
+					stream = new Mp4Stream(fileStream);
+					file = new Mp4File(stream);
+
+					List<Mp4Box> unknowBoxes = file.Boxes.FindAll(b => b is Mp4UnknownBox);
+
+					if (unknowBoxes.Count > 1)
+						throw new Exception("Too many unknow boxes.");
+
+					View.Dispatcher.Invoke(new Action(delegate
+					{
+						this.View.RootNode = BuildTree(file, new FileInfo(fileName).Name);
+
+						controller.RemoveViews();
+					}));
+				}
+				catch (Exception ex)
+				{
+					exceptionError = ex;
+				}
+			};
+
+			ProgressWindow progressWindow = new ProgressWindow();
+
+			progressWindow.Worker = backgroundWorker;
+
+			progressWindow.ShowDialog();
+
+			if (exceptionError != null)
+				throw exceptionError;
+		}
 
         /// <summary>
         /// 
